@@ -21,6 +21,9 @@
 NAME				=	vowphpal_wabbit
 
 
+#	Path to Vowpal Wabbit installation. Default is mentioned below.
+VWPATH				=	/usr/local
+
 #
 #	Php.ini directories
 #
@@ -30,7 +33,6 @@ NAME				=	vowphpal_wabbit
 #
 
 INI_DIR				=	/etc/php.d
-
 
 #
 #	The extension dirs
@@ -85,8 +87,8 @@ LINKER				=	g++
 #	with a list of all flags that should be passed to the linker.
 #
 
-COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic -I/usr/local/include/vowpalwabbit/ -o
-LINKER_FLAGS		=	-shared
+COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic -I${VWPATH}/include/vowpalwabbit/ -o
+LINKER_FLAGS		=	-shared -L${VWPATH}/lib/
 LINKER_DEPENDENCIES	=	-lphpcpp -lvw -lvw_c_wrapper
 
 
@@ -129,6 +131,10 @@ ${OBJECTS}:				${SOURCES}
 install:		
 						${CP} ${EXTENSION} ${EXTENSION_DIR}
 						${CP} ${INI} ${INI_DIR}
+
+uninstall:
+						${RM} ${EXTENSION_DIR}/${EXTENSION}
+						${RM} ${INI_DIR}/${INI}
 				
 clean:
 						${RM} ${EXTENSION} ${OBJECTS}
