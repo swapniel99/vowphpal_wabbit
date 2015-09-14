@@ -24,6 +24,10 @@ NAME				=	vowphpal_wabbit
 #	Path to Vowpal Wabbit installation. Default is mentioned below.
 VWPATH				=	/usr/local
 
+
+#	Path to PHP-CPP installation. Default is mentioned below.
+PHPCPPPATH			=	/usr
+
 #
 #	Php.ini directories
 #
@@ -87,8 +91,8 @@ LINKER				=	g++
 #	with a list of all flags that should be passed to the linker.
 #
 
-COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic -I${VWPATH}/include/vowpalwabbit/ -o
-LINKER_FLAGS		=	-shared -L${VWPATH}/lib/
+COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic -I${PHPCPPPATH}/include -I${VWPATH}/include/vowpalwabbit/ -o
+LINKER_FLAGS		=	-shared -L${PHPCPPPATH}/lib -L${VWPATH}/lib/
 LINKER_DEPENDENCIES	=	-lphpcpp -lvw -lvw_c_wrapper
 
 
