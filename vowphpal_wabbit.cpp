@@ -1,22 +1,41 @@
 #include <phpcpp.h>
 #include <vwdll.h>
+#include <cmath>
+#include <fstream>
 
 /**
  *  tell the compiler that the get_module is a pure C function
  */
 
+float* initializeSigmoid()
+{
+    float* pars = (float*)malloc(2*sizeof(float));
+    std::ifstream sigfile("/home/ec2-user/sigpars.txt");
+    if(sigfile.good())
+        sigfile >> pars[0] >> pars[1];
+    sigfile.close();
+    return pars;
+}
+
+float sigmoid(float x, float a, float b)
+{
+    return (1/(1+exp(b-a*x)));
+}
+
 class VowPHPal_Wabbit : public Php::Base
 {
     private:
         static void* _modelPointer;
+	static float* _sigPars;
         static int _counter;
 
         static Php::Value getctr(const char* exstring)
         {
             void* example = VW_ReadExampleA(_modelPointer, exstring);
-            Php::Value score = VW_Predict(_modelPointer, example);
-	    VW_FinishExample(_modelPointer, example);
-            return score;
+            float score = VW_Predict(_modelPointer, example);
+            VW_FinishExample(_modelPointer, example);
+            Php::Value ctr = sigmoid(score, _sigPars[0], _sigPars[1]);
+            return ctr;
         }
 
     public:
@@ -47,6 +66,7 @@ class VowPHPal_Wabbit : public Php::Base
 };
 
 void* VowPHPal_Wabbit::_modelPointer = VW_InitializeA("--quiet -t -i /home/ec2-user/model.vw");
+float* VowPHPal_Wabbit::_sigPars = initializeSigmoid();
 int VowPHPal_Wabbit::_counter = 0;
 
 extern "C" {
