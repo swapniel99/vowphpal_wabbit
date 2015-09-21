@@ -10,14 +10,21 @@ class VowPHPal_Wabbit : public Php::Base
     private:
         static void* _modelPointer;
         static int _counter;
+
+        static Php::Value getctr(const char* exstring)
+        {
+            void* example = VW_ReadExampleA(_modelPointer, exstring);
+            Php::Value score = VW_Predict(_modelPointer, example);
+	    VW_FinishExample(_modelPointer, example);
+            return score;
+        }
+
     public:
         VowPHPal_Wabbit() {}
         virtual ~VowPHPal_Wabbit() {}
         static Php::Value getPrediction(Php::Parameters &params)
         {
-            void* example = VW_ReadExampleA(_modelPointer, (char*)(params[0].rawValue()));
-            Php::Value score = VW_Predict(_modelPointer, example);
-            VW_FinishExample(_modelPointer, example);
+            Php::Value score = getctr((const char*)(params[0].rawValue()));
             _counter++;
             return score;
         }
@@ -27,9 +34,7 @@ class VowPHPal_Wabbit : public Php::Base
             std::vector<Php::Value> exampleArray = params[0];
             for (Php::Value &exampleStr : exampleArray)
             {
-                void* example = VW_ReadExampleA(_modelPointer, exampleStr.rawValue());
-                Php::Value score = VW_Predict(_modelPointer, example);
-                VW_FinishExample(_modelPointer, example);
+                Php::Value score = getctr(exampleStr.rawValue());
                 res.push_back(score);
                 _counter++;
             }
