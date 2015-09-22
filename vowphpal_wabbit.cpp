@@ -3,10 +3,7 @@
 #include <cmath>
 #include <fstream>
 
-/**
- *  tell the compiler that the get_module is a pure C function
- */
-
+// Reads parameters of the sigmoid function used for scaling from raw scores to CTR
 float* initializeSigmoid()
 {
     float* pars = (float*)malloc(2*sizeof(float));
@@ -17,11 +14,13 @@ float* initializeSigmoid()
     return pars;
 }
 
+// Sigmoid function of linear function of x
 float sigmoid(float x, float a, float b)
 {
     return (1/(1+exp(b-a*x)));
 }
 
+// The class with static values loaded at beginning of each Apache instance
 class VowPHPal_Wabbit : public Php::Base
 {
     private:
@@ -29,7 +28,8 @@ class VowPHPal_Wabbit : public Php::Base
 	static float* _sigPars;
         static int _counter;
 
-        static Php::Value getctr(const char* exstring)
+        // Takes care of calling VW ans scaling the score for a given example
+        static Php::Value predict1(const char* exstring)
         {
             void* example = VW_ReadExampleA(_modelPointer, exstring);
             float score = VW_Predict(_modelPointer, example);
@@ -41,19 +41,23 @@ class VowPHPal_Wabbit : public Php::Base
     public:
         VowPHPal_Wabbit() {}
         virtual ~VowPHPal_Wabbit() {}
+
+        // Get prediction of a single example.
         static Php::Value getPrediction(Php::Parameters &params)
         {
-            Php::Value score = getctr((const char*)(params[0].rawValue()));
+            Php::Value score = predict1((const char*)(params[0].rawValue()));
             _counter++;
             return score;
         }
+
+        // Get predictions for an array of examples.
         static Php::Value getnPredictions(Php::Parameters &params)
         {
             std::vector<Php::Value> res;
             std::vector<Php::Value> exampleArray = params[0];
             for (Php::Value &exampleStr : exampleArray)
             {
-                Php::Value score = getctr(exampleStr.rawValue());
+                Php::Value score = predict1(exampleStr.rawValue());
                 res.push_back(score);
                 _counter++;
             }
@@ -68,6 +72,10 @@ class VowPHPal_Wabbit : public Php::Base
 void* VowPHPal_Wabbit::_modelPointer = VW_InitializeA("--quiet -t -i /home/ec2-user/model.vw");
 float* VowPHPal_Wabbit::_sigPars = initializeSigmoid();
 int VowPHPal_Wabbit::_counter = 0;
+
+/**
+ *  tell the compiler that the get_module is a pure C function
+ */
 
 extern "C" {
     
