@@ -7,7 +7,7 @@
 float* initializeSigmoid()
 {
     float* pars = (float*)malloc(2*sizeof(float));
-    std::ifstream sigfile("/home/ec2-user/sigpars.txt");
+    std::ifstream sigfile("/var/www/html/domains/market/var/cache/ctrmodel/sigpars.txt");
     if(sigfile.good())
         sigfile >> pars[0] >> pars[1];
     sigfile.close();
@@ -69,7 +69,7 @@ class VowPHPal_Wabbit : public Php::Base
         }
 };
 
-void* VowPHPal_Wabbit::_modelPointer = VW_InitializeA("--quiet -t -i /home/ec2-user/model.vw");
+void* VowPHPal_Wabbit::_modelPointer = VW_InitializeA("--quiet -t -i /var/www/html/domains/market/var/cache/ctrmodel/model.vw");
 float* VowPHPal_Wabbit::_sigPars = initializeSigmoid();
 int VowPHPal_Wabbit::_counter = 0;
 
