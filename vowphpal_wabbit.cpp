@@ -7,14 +7,14 @@
 float* initializeSigmoid()
 {
     float* pars = (float*)malloc(2*sizeof(float));
-    std::ifstream sigfile("/var/www/html/domains/market/var/cache/ctrmodel/sigpars.txt");
+    std::ifstream sigfile("/var/www/html/domains/market/var/cache/ctrmodel/sigpars.model");
     if(sigfile.good())
         sigfile >> pars[0] >> pars[1];
     sigfile.close();
     return pars;
 }
 
-// Sigmoid function of linear function of x
+// Sigmoid function of linear combination of x
 float sigmoid(float x, float a, float b)
 {
     return (1/(1+exp(b-a*x)));
@@ -24,11 +24,11 @@ float sigmoid(float x, float a, float b)
 class VowPHPal_Wabbit : public Php::Base
 {
     private:
-        static void* _modelPointer;
-	static float* _sigPars;
-        static int _counter;
+        static void* _modelPointer;	// Pointer to LR model in memory
+        static float* _sigPars;		// Pointer to Sigmoid model in memory
+        static int _counter;		// Count of number of predictions
 
-        // Takes care of calling VW ans scaling the score for a given example
+        // Takes care of calling VW and scaling the score for a given example
         static Php::Value predict1(const char* exstring)
         {
             void* example = VW_ReadExampleA(_modelPointer, exstring);
@@ -39,8 +39,12 @@ class VowPHPal_Wabbit : public Php::Base
         }
 
     public:
-        VowPHPal_Wabbit() {}
-        virtual ~VowPHPal_Wabbit() {}
+
+	// Default Constructor
+	VowPHPal_Wabbit() {}
+        
+	// Destructor
+	virtual ~VowPHPal_Wabbit() {}
 
         // Get prediction of a single example.
         static Php::Value getPrediction(Php::Parameters &params)
@@ -63,14 +67,21 @@ class VowPHPal_Wabbit : public Php::Base
             }
             return (Php::Value)res;
         }
-        static Php::Value getCounter()
+        
+	// Get number of predictions done since model was initialized
+	static Php::Value getCounter()
         {
             return _counter;
         }
 };
 
-void* VowPHPal_Wabbit::_modelPointer = VW_InitializeA("--quiet -t -i /var/www/html/domains/market/var/cache/ctrmodel/model.vw");
+
+// Static Member Initialisation
+// aws s3 cp s3://... /var/www/html/domains/market/var/cache/ctrmodel/model_lr.model
+void* VowPHPal_Wabbit::_modelPointer = VW_InitializeA("--quiet -t -i /var/www/html/domains/market/var/cache/ctrmodel/model_lr.model");
+
 float* VowPHPal_Wabbit::_sigPars = initializeSigmoid();
+
 int VowPHPal_Wabbit::_counter = 0;
 
 /**
@@ -94,13 +105,16 @@ extern "C" {
         
         // @todo    add your own functions, classes, namespaces to the extension
         Php::Class<VowPHPal_Wabbit> vowphpal_wabbit("VowPHPal_Wabbit");
-        vowphpal_wabbit.method("getPrediction", &VowPHPal_Wabbit::getPrediction, {
+        
+	vowphpal_wabbit.method("getPrediction", &VowPHPal_Wabbit::getPrediction, {
                 Php::ByRef("exampleString", Php::Type::String)
                 });
-        vowphpal_wabbit.method("getnPredictions", &VowPHPal_Wabbit::getnPredictions, {
+        
+	vowphpal_wabbit.method("getnPredictions", &VowPHPal_Wabbit::getnPredictions, {
                 Php::ByRef("exampleStringArray", Php::Type::Array)
                 });
-        vowphpal_wabbit.method("getCounter", &VowPHPal_Wabbit::getCounter);
+        
+	vowphpal_wabbit.method("getCounter", &VowPHPal_Wabbit::getCounter);
 
         vwextension.add(std::move(vowphpal_wabbit));
         
