@@ -2,8 +2,16 @@
 A PHP wrapper for Vowpal Wabbit
 
 Only a variable can be passed into a function and NOT a literal.
-for eg. f("hello");  is not correct.
-instead save "hello" in $h and call f($h);
+
+For eg. 
+```
+f("hello");  <--  is not correct.
+```
+instead do: 
+```
+$h = "hello";
+f($h);
+```
 
 Example usage in PHP:
 ```
@@ -41,5 +49,5 @@ So in PHP simply check if a model exists and use it if it is present. Load a new
 NOTES:
 I have only used this setup with -t option until now. But I am not sure at this point whether it can be used for training.
 -r option doesn't work here.
-Since this loads model file directly into memory, please verify the integreity of model file. Theoretically it is vulnerable to injection.
+Since this loads model file directly into memory, please verify the integrity of model file. Theoretically it is vulnerable to injection.
 
