@@ -15,11 +15,11 @@ php> VowPHPal_Wabbit::initializeStaticModel($init);
 php> echo VowPHPal_Wabbit::isModelPresent();
 1
 
-php> $test="-1 |n1 a b c |n2 b:4";
+php> $test = "-1 |n1 a b c |n2 b:4";
 php> echo VowPHPal_Wabbit::getPrediction($test);
 0.3
 
-php> $test2=array("-1 |n1 a b c |n2 b:4","-1 |n1 a b c |n2 b:4");
+php> $test2 = array("-1 |n1 a b c |n2 b:4","-1 |n1 a b c |n2 b:4");
 php> $res = VowPHPal_Wabbit::getnPredictions($test2);
 php> echo $res[0];
 0.3
