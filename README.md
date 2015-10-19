@@ -6,41 +6,34 @@ for eg. f("hello");  is not correct.
 instead save "hello" in $h and call f($h);
 
 Example usage in PHP:
-
+```
 php> echo VowPHPal_Wabbit::isModelPresent();
-
 0
 
 php> $init = "--quiet -t -i /path/to/modelfile";
 php> VowPHPal_Wabbit::initializeStaticModel($init);
-
 php> echo VowPHPal_Wabbit::isModelPresent();
-
 1
 
 php> $test="-1 |n1 a b c |n2 b:4";
 php> echo VowPHPal_Wabbit::getPrediction($test);
-
 0.3
 
 php> $test2=array("-1 |n1 a b c |n2 b:4","-1 |n1 a b c |n2 b:4");
 php> $res = VowPHPal_Wabbit::getnPredictions($test2);
-
 php> echo $res[0];
-
 0.3
 
 php> echo VowPHPal_Wabbit::getCounter();
-
 3
 
 php> VowPHPal_Wabbit::finishStaticModel();
-
+```
 Once model is finished scores cannot be predicted. It always returns 0.
 If a new model is initialised before finishing old model, old model is automatically finished.
 
 In case of apache prefork, once model is initialsed it will be used again and again without reading model file from disk each time.
-The totoal number of model file reads with one initialise per thread = number of apache threads
+The total number of model file reads with one initialise per thread = number of apache threads
 Also the counter will be maintained separately for each apache thread.
 
 So in PHP simply check if a model exists and use it if it is present. Load a new model if necessary. 
