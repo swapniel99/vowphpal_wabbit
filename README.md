@@ -7,29 +7,34 @@ instead save "hello" in $h and call f($h);
 
 Example usage in PHP:
 
-> echo VowPHPal_Wabbit::isModelPresent();
+php> echo VowPHPal_Wabbit::isModelPresent();
+
 0
 
-> $init = "--quiet -t -i /path/to/modelfile";
-> VowPHPal_Wabbit::initializeStaticModel($init);
+php> $init = "--quiet -t -i /path/to/modelfile";
+php> VowPHPal_Wabbit::initializeStaticModel($init);
 
-> echo VowPHPal_Wabbit::isModelPresent();
+php> echo VowPHPal_Wabbit::isModelPresent();
+
 1
 
-> $test="-1 |n1 a b c |n2 b:4";
-> echo VowPHPal_Wabbit::getPrediction($test);
+php> $test="-1 |n1 a b c |n2 b:4";
+php> echo VowPHPal_Wabbit::getPrediction($test);
+
 0.3
 
-> $test2=array("-1 |n1 a b c |n2 b:4","-1 |n1 a b c |n2 b:4");
-> $res = VowPHPal_Wabbit::getnPredictions($test2);
+php> $test2=array("-1 |n1 a b c |n2 b:4","-1 |n1 a b c |n2 b:4");
+php> $res = VowPHPal_Wabbit::getnPredictions($test2);
 
-> echo $res[0];
+php> echo $res[0];
+
 0.3
 
-> echo VowPHPal_Wabbit::getCounter();
+php> echo VowPHPal_Wabbit::getCounter();
+
 3
 
-> VowPHPal_Wabbit::finishStaticModel();
+php> VowPHPal_Wabbit::finishStaticModel();
 
 Once model is finished scores cannot be predicted. It always returns 0.
 If a new model is initialised before finishing old model, old model is automatically finished.
