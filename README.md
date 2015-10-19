@@ -1,6 +1,10 @@
 # vowphpal_wabbit
 A PHP wrapper for Vowpal Wabbit
 
+Prerequisites:
+Vowpal Wabbit : https://github.com/JohnLangford/vowpal_wabbit/wiki
+PHP-CPP : http://www.php-cpp.com/
+
 Only a variable can be passed into a function and NOT a literal.
 
 For eg. 
