@@ -8,11 +8,11 @@
 class VowPHPal_Wabbit : public Php::Base
 {
     private:
-        static void* _modelPointer;	// Pointer to LR model in memory
-        static int _counter;		// Count of number of predictions
+        static void* _modelPointer;    // Pointer to LR model in memory
+        static int _counter;           // Count of number of predictions
 
         // Takes care of calling VW returning the score for a given example
-        static Php::Value predict1(const char* exstring)
+        static Php::Value predict(const char* exstring)
         {
             Php::Value score=0f;
             if(_modelPointer==NULL)
@@ -26,11 +26,11 @@ class VowPHPal_Wabbit : public Php::Base
 
     public:
 
-	    // Default Constructor
-	    VowPHPal_Wabbit() {}
+        // Default Constructor
+        VowPHPal_Wabbit() {}
         
-	    // Destructor
-	    virtual ~VowPHPal_Wabbit() {}
+        // Destructor
+        virtual ~VowPHPal_Wabbit() {}
 
         //Initialize static model using "--quiet -t -i /path/to/model"
         static void initializeStaticModel(Php::Parameters &params)
@@ -62,7 +62,7 @@ class VowPHPal_Wabbit : public Php::Base
         // Get prediction of a single example.
         static Php::Value getPrediction(Php::Parameters &params)
         {
-            Php::Value score = predict1((const char*)(params[0].rawValue()));
+            Php::Value score = predict((const char*)(params[0].rawValue()));
             return score;
         }
 
@@ -73,14 +73,14 @@ class VowPHPal_Wabbit : public Php::Base
             std::vector<Php::Value> exampleArray = params[0];
             for (Php::Value &exampleStr : exampleArray)
             {
-                Php::Value score = predict1(exampleStr.rawValue());
+                Php::Value score = predict(exampleStr.rawValue());
                 res.push_back(score);
             }
             return (Php::Value)res;
         }
         
-	    // Get number of predictions done since model was initialized
-	    static Php::Value getCounter()
+        // Get number of predictions done since model was initialized
+        static Php::Value getCounter()
         {
             return _counter;
         }
@@ -113,24 +113,24 @@ extern "C" {
         // @todo    add your own functions, classes, namespaces to the extension
         Php::Class<VowPHPal_Wabbit> vowphpal_wabbit("VowPHPal_Wabbit");
         
-    	vowphpal_wabbit.method("initializeStaticModel", &VowPHPal_Wabbit::initializeStaticModel, {
+        vowphpal_wabbit.method("initializeStaticModel", &VowPHPal_Wabbit::initializeStaticModel, {
                 Php::ByRef("exampleString", Php::Type::String)
                 });
 
 
-    	vowphpal_wabbit.method("finishStaticModel", &VowPHPal_Wabbit::finishStaticModel, {});
+        vowphpal_wabbit.method("finishStaticModel", &VowPHPal_Wabbit::finishStaticModel, {});
 
-    	vowphpal_wabbit.method("isModelPresent", &VowPHPal_Wabbit::isModelPresent, {});
+        vowphpal_wabbit.method("isModelPresent", &VowPHPal_Wabbit::isModelPresent, {});
 
-    	vowphpal_wabbit.method("getPrediction", &VowPHPal_Wabbit::getPrediction, {
+        vowphpal_wabbit.method("getPrediction", &VowPHPal_Wabbit::getPrediction, {
                 Php::ByRef("exampleString", Php::Type::String)
                 });
         
-	    vowphpal_wabbit.method("getnPredictions", &VowPHPal_Wabbit::getnPredictions, {
+        vowphpal_wabbit.method("getnPredictions", &VowPHPal_Wabbit::getnPredictions, {
                 Php::ByRef("exampleStringArray", Php::Type::Array)
                 });
         
-    	vowphpal_wabbit.method("getCounter", &VowPHPal_Wabbit::getCounter);
+        vowphpal_wabbit.method("getCounter", &VowPHPal_Wabbit::getCounter);
 
         vwextension.add(std::move(vowphpal_wabbit));
         
