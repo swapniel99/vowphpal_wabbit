@@ -3,7 +3,6 @@
 #include <cmath>
 #include <fstream>
 
-
 // The class with static values loaded at beginning of each Apache instance
 class VowPHPal_Wabbit : public Php::Base
 {
@@ -14,7 +13,7 @@ class VowPHPal_Wabbit : public Php::Base
         // Takes care of calling VW returning the score for a given example
         static Php::Value predict(const char* exstring)
         {
-            Php::Value score=0f;
+            Php::Value score=0.0f;
             if(_modelPointer==NULL)
                 return score;
             void* example = VW_ReadExampleA(_modelPointer, exstring);
@@ -30,7 +29,11 @@ class VowPHPal_Wabbit : public Php::Base
         VowPHPal_Wabbit() {}
         
         // Destructor
-        virtual ~VowPHPal_Wabbit() {}
+        virtual ~VowPHPal_Wabbit()
+        {
+            VW_Finish(_modelPointer);
+            _modelPointer = NULL;
+        }
 
         //Initialize static model using "--quiet -t -i /path/to/model"
         static void initializeStaticModel(Php::Parameters &params)
@@ -73,7 +76,7 @@ class VowPHPal_Wabbit : public Php::Base
             std::vector<Php::Value> exampleArray = params[0];
             for (Php::Value &exampleStr : exampleArray)
             {
-                Php::Value score = predict(exampleStr.rawValue());
+                Php::Value score = predict((const char*)(exampleStr.rawValue()));
                 res.push_back(score);
             }
             return (Php::Value)res;
@@ -82,7 +85,7 @@ class VowPHPal_Wabbit : public Php::Base
         // Get number of predictions done since model was initialized
         static Php::Value getCounter()
         {
-            return _counter;
+            return (Php::Value)_counter;
         }
 };
 
@@ -108,7 +111,7 @@ extern "C" {
     {
         // static(!) Php::Extension object that should stay in memory
         // for the entire duration of the process (that's why it's static)
-        static Php::Extension vwextension("vowphpal_wabbit", "1.1");
+        static Php::Extension vwextension("vowphpal_wabbit", "1.2");
         
         // @todo    add your own functions, classes, namespaces to the extension
         Php::Class<VowPHPal_Wabbit> vowphpal_wabbit("VowPHPal_Wabbit");
